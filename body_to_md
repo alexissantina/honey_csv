@@ -1,0 +1,8 @@
+//convert the body column to text file with name title
+
+require 'csv'
+CSV.foreach("/Users/bageltown/Documents/intranetdata/posts.csv") do |row|
+  title = row[2]
+  wiki_doc = File.new(title+".md", mode="wb")
+  wiki_doc.write(row[3])
+end
