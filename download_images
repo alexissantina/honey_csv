@@ -1,0 +1,29 @@
+require 'csv'
+require 'htmlentities'
+require 'uri'
+
+def createArray
+  urlsArray = []
+  CSV.foreach("/Users/bageltown/Documents/intranetdata/posts.csv") do |post|
+  	if post[3] == nil
+  		next
+  	end
+    urlsArray += post[3].scan(/<img[^>]+src=(?:\"|\')\K(https:\/\/cozyco.atlassian.net\/wiki\/download\/attachments\/.[^">]+?)(?=\"|\')/).flatten
+  end
+  urlsArray.map {|i| HTMLEntities.new.decode i}
+end
+
+def createPng (url)
+	name = File.basename(URI.parse(url).path)
+	puts name
+	curlCommand = %Q[curl -v -o /Users/bageltown/Dropbox/confluence_images/#{name} -L "#{url}" -H 'Cookie: JSESSIONID=99937E41C379DD06086FFF3A852AEBBE; JSESSIONID=1EC119D56184C11E507728EA07DEE089; studio.crowd.tokenkey=fLH5zXuMi1KxLJrTipbalQ00']
+	puts curlCommand
+	%x[#{curlCommand}]
+end
+
+
+urlsArrayDecoded = createArray
+
+urlsArrayDecoded.each do |i|
+	createPng(i)
+end
